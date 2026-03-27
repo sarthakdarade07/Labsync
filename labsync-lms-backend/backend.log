@@ -65876,3 +65876,6 @@ Hibernate:
         days d1_0 
     where
         d1_0.id=?
+2026-03-27T03:04:10.377+05:30  INFO 59227 --- [ionShutdownHook] j.LocalContainerEntityManagerFactoryBean : Closing JPA EntityManagerFactory for persistence unit 'default'
+2026-03-27T03:04:10.378+05:30  INFO 59227 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown initiated...
+2026-03-27T03:04:10.379+05:30  INFO 59227 --- [ionShutdownHook] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Shutdown completed.

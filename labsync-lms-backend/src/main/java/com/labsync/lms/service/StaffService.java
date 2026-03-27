@@ -7,4 +7,6 @@ import java.util.List;
 public interface StaffService {
     List<Staff> getAllStaff();
     Staff createStaff(StaffRequest request);
+    Staff updateStaff(Long id, StaffRequest request);
+    void deleteStaff(Long id);
 }

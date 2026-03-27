@@ -30,4 +30,16 @@ public class SubjectController {
         Subject created = subjectService.createSubject(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Subject created successfully", created));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Subject>> updateSubject(@PathVariable Long id, @Valid @RequestBody SubjectRequest request) {
+        Subject updated = subjectService.updateSubject(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Subject updated successfully", updated));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteSubject(@PathVariable Long id) {
+        subjectService.deleteSubject(id);
+        return ResponseEntity.ok(ApiResponse.success("Subject deleted successfully", null));
+    }
 }

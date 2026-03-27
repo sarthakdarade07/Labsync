@@ -40,6 +40,7 @@ export default function Admin() {
 function FacultyTab() {
   const [faculty, setFaculty] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingFaculty, setEditingFaculty] = useState(null);
   const [newFaculty, setNewFaculty] = useState({ fullName: '', employeeId: '', designation: '', email: '', department: '' });
 
   const fetchFaculty = () => {
@@ -64,6 +65,22 @@ function FacultyTab() {
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || 'Failed to create faculty');
+    }
+  };
+
+  const submitEditFaculty = async () => {
+    if (!editingFaculty.fullName || !editingFaculty.employeeId) return alert("Full Name and Employee ID are required.");
+    try {
+      const res = await api.put(`/staff/${editingFaculty.id}`, editingFaculty);
+      if (res.data?.success || res.status === 200) {
+        setEditingFaculty(null);
+        fetchFaculty();
+      } else {
+        alert(res.data?.message || 'Error updating faculty');
+      }
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.message || 'Failed to update faculty');
     }
   };
 
@@ -97,6 +114,27 @@ function FacultyTab() {
         </div>
       )}
 
+      {editingFaculty && (
+        <div className="card animate-in" style={{ borderLeft: '3px solid var(--warning)', marginBottom: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="section-title" style={{ margin: 0 }}>Edit Faculty</div>
+            <div className="grid-2">
+              <input placeholder="Full Name (e.g. Prof. A. Sharma)" value={editingFaculty.fullName || ''} onChange={e => setEditingFaculty(p => ({ ...p, fullName: e.target.value }))} />
+              <input placeholder="Employee ID" value={editingFaculty.employeeId || ''} onChange={e => setEditingFaculty(p => ({ ...p, employeeId: e.target.value }))} />
+            </div>
+            <div className="grid-2" style={{ gap: 8 }}>
+              <input placeholder="Designation (e.g. Assistant Professor)" value={editingFaculty.designation || ''} onChange={e => setEditingFaculty(p => ({ ...p, designation: e.target.value }))} />
+              <input placeholder="Email" value={editingFaculty.email || ''} onChange={e => setEditingFaculty(p => ({ ...p, email: e.target.value }))} />
+            </div>
+            <input placeholder="Department" value={editingFaculty.department || ''} onChange={e => setEditingFaculty(p => ({ ...p, department: e.target.value }))} />
+            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              <button className="btn btn-primary btn-sm" onClick={submitEditFaculty}>Save Changes</button>
+              <button className="btn btn-secondary btn-sm" onClick={() => setEditingFaculty(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <table>
         <thead><tr><th>ID</th><th>Name</th><th>Designation</th><th>Email</th><th></th></tr></thead>
         <tbody>
@@ -106,7 +144,7 @@ function FacultyTab() {
               <td style={{ color: 'var(--text)', fontWeight: 600 }}>{f.fullName}</td>
               <td>{f.designation}</td>
               <td style={{ fontFamily: 'var(--mono)', fontSize: 12 }}>{f.email}</td>
-              <td><button className="btn btn-secondary btn-sm">Edit</button></td>
+              <td><button className="btn btn-secondary btn-sm" onClick={() => setEditingFaculty(f)}>Edit</button></td>
             </tr>
           ))}
         </tbody>
@@ -118,6 +156,7 @@ function FacultyTab() {
 function SubjectsTab() {
   const [subjects, setSubjects] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingSubject, setEditingSubject] = useState(null);
   const [newSubject, setNewSubject] = useState({ name: '', subjectCode: '', description: '', hoursPerWeek: 2 });
 
   const fetchSubjects = () => {
@@ -139,6 +178,19 @@ function SubjectsTab() {
       } else alert(res.data?.message || 'Error creating subject');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to create subject');
+    }
+  };
+
+  const submitEditSubject = async () => {
+    if (!editingSubject.name || !editingSubject.subjectCode) return alert("Name and Code are required.");
+    try {
+      const res = await api.put(`/subjects/${editingSubject.id}`, editingSubject);
+      if (res.data?.success || res.status === 200) {
+        setEditingSubject(null);
+        fetchSubjects();
+      } else alert(res.data?.message || 'Error updating subject');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update subject');
     }
   };
 
@@ -171,6 +223,26 @@ function SubjectsTab() {
         </div>
       )}
 
+      {editingSubject && (
+        <div className="card animate-in" style={{ borderLeft: '3px solid var(--warning)', marginBottom: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="section-title" style={{ margin: 0 }}>Edit Subject</div>
+            <div className="grid-2">
+              <input placeholder="Subject Name (e.g. Database Lab)" value={editingSubject.name || ''} onChange={e => setEditingSubject(p => ({ ...p, name: e.target.value }))} />
+              <input placeholder="Subject Code (e.g. CSB301)" value={editingSubject.subjectCode || ''} onChange={e => setEditingSubject(p => ({ ...p, subjectCode: e.target.value }))} />
+            </div>
+            <div className="grid-2">
+              <input placeholder="Description" value={editingSubject.description || ''} onChange={e => setEditingSubject(p => ({ ...p, description: e.target.value }))} />
+              <input type="number" placeholder="Hours Per Week (Credits)" value={editingSubject.hoursPerWeek || ''} onChange={e => setEditingSubject(p => ({ ...p, hoursPerWeek: parseInt(e.target.value) || 2 }))} />
+            </div>
+            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              <button className="btn btn-primary btn-sm" onClick={submitEditSubject}>Save Changes</button>
+              <button className="btn btn-secondary btn-sm" onClick={() => setEditingSubject(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <table>
         <thead><tr><th>Code</th><th>Name</th><th>Credits (Hrs/Wk)</th><th></th></tr></thead>
         <tbody>
@@ -179,7 +251,7 @@ function SubjectsTab() {
               <td style={{ fontFamily: 'var(--mono)', color: 'var(--accent)' }}>{s.subjectCode}</td>
               <td style={{ color: 'var(--text)', fontWeight: 600 }}>{s.name}</td>
               <td style={{ fontFamily: 'var(--mono)' }}>{s.hoursPerWeek}</td>
-              <td><button className="btn btn-secondary btn-sm">Edit</button></td>
+              <td><button className="btn btn-secondary btn-sm" onClick={() => setEditingSubject(s)}>Edit</button></td>
             </tr>
           ))}
         </tbody>
@@ -319,6 +391,7 @@ function SettingsTab() {
 function BatchesTab() {
   const [batches, setBatches] = useState([]);
   const [showAddModal, setShowAddModal] = useState(false);
+  const [editingBatch, setEditingBatch] = useState(null);
   const [newBatch, setNewBatch] = useState({ batchName: '', division: '', studentCount: 30, semester: '', programId: 1, academicYearId: 1, osRequirement: 'Any', labsPerWeek: 1, totalHours: '', startTime: '', endTime: '' });
 
   const fetchBatches = () => {
@@ -343,6 +416,26 @@ function BatchesTab() {
       } else alert(res.data?.message || 'Error creating batch');
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to create batch');
+    }
+  };
+
+  const submitEditBatch = async () => {
+    if (!editingBatch.batchName || !editingBatch.division) return alert("Name and Division are required.");
+    try {
+      const payload = { 
+        ...editingBatch,
+        programId: editingBatch.program?.id || 1,
+        academicYearId: editingBatch.academicYear?.id || 1
+      };
+      if (!payload.startTime) payload.startTime = null;
+      if (!payload.endTime) payload.endTime = null;
+      const res = await api.put(`/batches/${editingBatch.id}`, payload);
+      if (res.data?.success || res.status === 200) {
+        setEditingBatch(null);
+        fetchBatches();
+      } else alert(res.data?.message || 'Error updating batch');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to update batch');
     }
   };
 
@@ -385,6 +478,36 @@ function BatchesTab() {
         </div>
       )}
 
+      {editingBatch && (
+        <div className="card animate-in" style={{ borderLeft: '3px solid var(--warning)', marginBottom: 20 }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
+            <div className="section-title" style={{ margin: 0 }}>Edit Batch</div>
+            <div className="grid-2">
+              <input placeholder="Batch Name (e.g. Batch A3)" value={editingBatch.batchName || ''} onChange={e => setEditingBatch(p => ({ ...p, batchName: e.target.value }))} />
+              <input placeholder="Division (e.g. CSE-A)" value={editingBatch.division || ''} onChange={e => setEditingBatch(p => ({ ...p, division: e.target.value }))} />
+            </div>
+            <div className="grid-2">
+              <input placeholder="Semester (e.g. SEM-5)" value={editingBatch.semester || ''} onChange={e => setEditingBatch(p => ({ ...p, semester: e.target.value }))} />
+              <input type="number" placeholder="Student Strength" value={editingBatch.studentCount || ''} onChange={e => setEditingBatch(p => ({ ...p, studentCount: parseInt(e.target.value) || 30 }))} />
+            </div>
+            <div className="grid-2">
+              <input placeholder="OS Requirement (e.g. Linux, Windows, Any)" value={editingBatch.osRequirement || ''} onChange={e => setEditingBatch(p => ({ ...p, osRequirement: e.target.value }))} />
+              <input type="number" placeholder="Labs Per Week" value={editingBatch.labsPerWeek || ''} onChange={e => setEditingBatch(p => ({ ...p, labsPerWeek: parseInt(e.target.value) || 1 }))} />
+            </div>
+            <div className="grid-3" style={{ gap: 12 }}>
+              <input type="number" placeholder="Total Hrs" value={editingBatch.totalHours || ''} onChange={e => setEditingBatch(p => ({ ...p, totalHours: parseInt(e.target.value) || '' }))} />
+              <input type="time" title="Start Time" value={editingBatch.startTime || ''} onChange={e => setEditingBatch(p => ({ ...p, startTime: e.target.value }))} />
+              <input type="time" title="End Time" value={editingBatch.endTime || ''} onChange={e => setEditingBatch(p => ({ ...p, endTime: e.target.value }))} />
+            </div>
+    
+            <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
+              <button className="btn btn-primary btn-sm" onClick={submitEditBatch}>Save Changes</button>
+              <button className="btn btn-secondary btn-sm" onClick={() => setEditingBatch(null)}>Cancel</button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <table>
         <thead><tr><th>Batch Name</th><th>Division</th><th>Semester</th><th>Strength</th><th>OS / Labs Per Week</th><th>Time (Start-End) / Hrs</th><th></th></tr></thead>
         <tbody>
@@ -398,10 +521,10 @@ function BatchesTab() {
               <td style={{ fontSize: 13 }}>
                 {(!b.startTime || b.startTime === '00:00:00' || b.startTime === '00:00') ? 'Any' : b.startTime.substring(0,5)} - 
                 {(!b.endTime || b.endTime === '00:00:00' || b.endTime === '00:00') ? 'Any' : b.endTime.substring(0,5)} 
-                ({b.totalHours ? b.totalHours + 'h' : 'N/A'})
+                {(!editingBatch && b.totalHours) ? b.totalHours + 'h' : 'N/A'}
               </td>
     
-              <td><button className="btn btn-secondary btn-sm">Edit</button></td>
+              <td><button className="btn btn-secondary btn-sm" onClick={() => setEditingBatch(b)}>Edit</button></td>
             </tr>
           ))}
         </tbody>

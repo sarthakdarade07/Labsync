@@ -32,4 +32,24 @@ public class StaffServiceImpl implements StaffService {
             .build();
         return staffRepository.save(staff);
     }
+
+    @Override
+    public Staff updateStaff(Long id, StaffRequest request) {
+        Staff existing = staffRepository.findById(id)
+            .orElseThrow(() -> new com.labsync.lms.exception.ResourceNotFoundException("Staff", "id", id));
+        existing.setFullName(request.getFullName());
+        existing.setEmployeeId(request.getEmployeeId());
+        existing.setEmail(request.getEmail());
+        existing.setPhone(request.getPhone());
+        existing.setDepartment(request.getDepartment());
+        existing.setDesignation(request.getDesignation());
+        return staffRepository.save(existing);
+    }
+
+    @Override
+    public void deleteStaff(Long id) {
+        Staff existing = staffRepository.findById(id)
+            .orElseThrow(() -> new com.labsync.lms.exception.ResourceNotFoundException("Staff", "id", id));
+        staffRepository.delete(existing);
+    }
 }

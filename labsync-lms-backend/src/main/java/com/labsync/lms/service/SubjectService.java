@@ -7,4 +7,6 @@ import java.util.List;
 public interface SubjectService {
     List<Subject> getAllSubjects();
     Subject createSubject(SubjectRequest request);
+    Subject updateSubject(Long id, SubjectRequest request);
+    void deleteSubject(Long id);
 }

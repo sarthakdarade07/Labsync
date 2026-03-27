@@ -31,4 +31,16 @@ public class StaffController {
         Staff created = staffService.createStaff(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("Staff created successfully", created));
     }
+
+    @PutMapping("/{id}")
+    public ResponseEntity<ApiResponse<Staff>> updateStaff(@PathVariable Long id, @Valid @RequestBody StaffRequest request) {
+        Staff updated = staffService.updateStaff(id, request);
+        return ResponseEntity.ok(ApiResponse.success("Staff updated successfully", updated));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ApiResponse<Void>> deleteStaff(@PathVariable Long id) {
+        staffService.deleteStaff(id);
+        return ResponseEntity.ok(ApiResponse.success("Staff deleted successfully", null));
+    }
 }

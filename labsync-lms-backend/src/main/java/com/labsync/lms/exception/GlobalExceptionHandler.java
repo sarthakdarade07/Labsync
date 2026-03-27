@@ -93,8 +93,8 @@ public class GlobalExceptionHandler {
     // ── 500 Internal Server Error ────────────────────────────────────────────
     @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public ApiResponse<Void> handleGeneral(Exception ex) {
+    public ApiResponse<Object> handleGeneral(Exception ex) {
         log.error("Unexpected error: ", ex);
-        return ApiResponse.error("An unexpected error occurred. Please try again later.");
+        return ApiResponse.builder().success(false).message("Unexpected error: " + ex.getMessage()).data(java.util.Arrays.toString(ex.getStackTrace())).build();
     }
 }

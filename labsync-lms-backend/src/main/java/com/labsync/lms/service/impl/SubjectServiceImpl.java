@@ -30,4 +30,22 @@ public class SubjectServiceImpl implements SubjectService {
             .build();
         return subjectRepository.save(subject);
     }
+
+    @Override
+    public Subject updateSubject(Long id, SubjectRequest request) {
+        Subject existing = subjectRepository.findById(id)
+            .orElseThrow(() -> new com.labsync.lms.exception.ResourceNotFoundException("Subject", "id", id));
+        existing.setName(request.getName());
+        existing.setSubjectCode(request.getSubjectCode());
+        existing.setDescription(request.getDescription());
+        existing.setHoursPerWeek(request.getHoursPerWeek());
+        return subjectRepository.save(existing);
+    }
+
+    @Override
+    public void deleteSubject(Long id) {
+        Subject existing = subjectRepository.findById(id)
+            .orElseThrow(() -> new com.labsync.lms.exception.ResourceNotFoundException("Subject", "id", id));
+        subjectRepository.delete(existing);
+    }
 }
