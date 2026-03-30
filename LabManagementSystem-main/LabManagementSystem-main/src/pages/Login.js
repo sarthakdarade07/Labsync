@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { Hexagon } from 'lucide-react';
 
 export default function Login() {
   const { login } = useAuth();
@@ -25,7 +26,7 @@ export default function Login() {
       <div style={styles.bg} />
       <div style={styles.card} className="animate-in">
         <div style={styles.logo}>
-          <div style={styles.logoIcon}>⬡</div>
+          <div style={styles.logoIcon}><Hexagon size={36} fill="var(--accent)" color="white" /></div>
           <div>
             <div style={styles.logoTitle}>LabSync</div>
             <div style={styles.logoSub}>MIT-WPU · Dept. of CSE & Technology</div>
@@ -78,8 +79,8 @@ export default function Login() {
 
 const styles = {
   page: { minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: 24, position: 'relative' },
-  bg: { position: 'fixed', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(59,130,246,0.12) 0%, transparent 70%)', pointerEvents: 'none' },
-  card: { background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 420, position: 'relative', zIndex: 1 },
+  bg: { position: 'fixed', inset: 0, background: 'radial-gradient(ellipse 80% 60% at 50% 0%, rgba(195,18,18,0.12) 0%, transparent 70%)', pointerEvents: 'none' },
+  card: { background: 'var(--card)', border: '1px solid var(--border)', borderRadius: 16, padding: '40px 36px', width: '100%', maxWidth: 420, position: 'relative', zIndex: 1, boxShadow: 'var(--shadow)' },
   logo: { display: 'flex', alignItems: 'center', gap: 12, marginBottom: 32 },
   logoIcon: { fontSize: 32, color: 'var(--accent)', lineHeight: 1 },
   logoTitle: { fontSize: 20, fontWeight: 700, fontFamily: 'var(--mono)', color: 'var(--text)' },

@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Plus, Monitor } from 'lucide-react';
 import api from '../api/axios';
 
 export default function Labs() {
@@ -79,7 +80,7 @@ export default function Labs() {
           <div className="section-title">Infrastructure</div>
           <h1 className="page-title">Labs &amp; PCs</h1>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)}>＋ Add Lab</button>
+        <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Plus size={16} /> Add Lab</button>
       </div>
 
       <div className="grid-3" style={{ marginBottom: 28 }}>

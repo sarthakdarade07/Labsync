@@ -1,21 +1,24 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
+import { LayoutDashboard, Monitor, Users, Calendar, Table, AlertTriangle, Settings, Home, Moon, Sun, LogOut, ChevronLeft, ChevronRight, Hexagon } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 
 const NAV = [
-  { to: '/dashboard',   icon: '⊞', label: 'Dashboard' },
-  { to: '/labs',        icon: '🖥', label: 'Labs & PCs' },
-  { to: '/batches',     icon: '👥', label: 'Batches' },
-  { to: '/schedule',   icon: '📅', label: 'Schedule' },
-  { to: '/timetable',  icon: '🗓', label: 'Timetable' },
-  { to: '/clashes',    icon: '⚠', label: 'Clash Detection' },
+  { to: '/dashboard',   icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
+  { to: '/labs',        icon: <Monitor size={18} />, label: 'Labs & PCs' },
+  { to: '/batches',     icon: <Users size={18} />, label: 'Batches' },
+  { to: '/schedule',    icon: <Calendar size={18} />, label: 'Schedule' },
+  { to: '/timetable',   icon: <Table size={18} />, label: 'Timetable' },
+  { to: '/clashes',     icon: <AlertTriangle size={18} />, label: 'Clash Detection' },
 ];
 const ADMIN_NAV = [
-  { to: '/admin',      icon: '⚙', label: 'Admin Panel' },
+  { to: '/admin',      icon: <Settings size={18} />, label: 'Admin Panel' },
 ];
 
 export default function Sidebar() {
   const { user, logout, isAdmin } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
   const [collapsed, setCollapsed] = useState(false);
 
@@ -26,20 +29,26 @@ export default function Sidebar() {
   return (
     <aside style={{ ...styles.aside, width: w, minWidth: w }}>
       <div style={styles.top}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: collapsed ? '0 14px' : '0 20px', overflow: 'hidden' }}>
-          <span style={{ fontSize: 22, color: 'var(--accent)', flexShrink: 0 }}>⬡</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: collapsed ? '0 20px' : '0 20px', overflow: 'hidden' }}>
+          <span style={{ color: 'var(--accent)', flexShrink: 0, display: 'flex' }}><Hexagon size={24} fill="var(--accent)" color="white" /></span>
           {!collapsed && <span style={styles.brand}>LabSync</span>}
         </div>
-        <button onClick={() => setCollapsed(c => !c)} style={styles.collapseBtn} title={collapsed ? 'Expand' : 'Collapse'}>
-          {collapsed ? '›' : '‹'}
+        <button onClick={() => setCollapsed(c => !c)} style={{ ...styles.collapseBtn, marginRight: collapsed ? 0 : 10, margin: collapsed ? '0 auto' : undefined }} title={collapsed ? 'Expand' : 'Collapse'}>
+          {collapsed ? <ChevronRight size={16} /> : <ChevronLeft size={16} />}
         </button>
       </div>
 
       <nav style={styles.nav}>
-        <p style={{ ...styles.navSection, opacity: collapsed ? 0 : 1 }}>Navigation</p>
+        <p style={{ ...styles.navSection, opacity: collapsed ? 0 : 1 }}>Quick Access</p>
+        <NavLink to="/" style={styles.link}>
+          <span style={{ display: 'flex', flexShrink: 0 }}><Home size={18} /></span>
+          {!collapsed && <span>Home Portal</span>}
+        </NavLink>
+
+        <p style={{ ...styles.navSection, marginTop: 16, opacity: collapsed ? 0 : 1 }}>Navigation</p>
         {NAV.map(({ to, icon, label }) => (
           <NavLink key={to} to={to} style={({ isActive }) => ({ ...styles.link, ...(isActive ? styles.activeLink : {}) })}>
-            <span style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
+            <span style={{ display: 'flex', flexShrink: 0 }}>{icon}</span>
             {!collapsed && <span>{label}</span>}
           </NavLink>
         ))}
@@ -48,7 +57,7 @@ export default function Sidebar() {
             <p style={{ ...styles.navSection, marginTop: 16, opacity: collapsed ? 0 : 1 }}>Admin</p>
             {ADMIN_NAV.map(({ to, icon, label }) => (
               <NavLink key={to} to={to} style={({ isActive }) => ({ ...styles.link, ...(isActive ? styles.activeLink : {}) })}>
-                <span style={{ fontSize: 16, flexShrink: 0 }}>{icon}</span>
+                <span style={{ display: 'flex', flexShrink: 0 }}>{icon}</span>
                 {!collapsed && <span>{label}</span>}
               </NavLink>
             ))}
@@ -66,10 +75,16 @@ export default function Sidebar() {
             </div>
           </div>
         )}
-        <button onClick={handleLogout} style={styles.logoutBtn} title="Logout">
-          <span>⏻</span>
-          {!collapsed && <span>Logout</span>}
-        </button>
+        <div style={{ display: 'flex', gap: 8, flexDirection: collapsed ? 'column' : 'row' }}>
+          <button onClick={toggleTheme} style={{ ...styles.actionBtn, flex: 1 }} title={`Switch to ${theme === 'light' ? 'Dark' : 'Light'} Mode`}>
+            <span>{theme === 'light' ? <Moon size={16} /> : <Sun size={16} />}</span>
+            {!collapsed && <span>{theme === 'light' ? 'Dark' : 'Light'}</span>}
+          </button>
+          <button onClick={handleLogout} style={{ ...styles.actionBtn, flex: 1 }} title="Logout">
+            <span><LogOut size={16} /></span>
+            {!collapsed && <span>Logout</span>}
+          </button>
+        </div>
       </div>
     </aside>
   );
@@ -87,5 +102,5 @@ const styles = {
   bottom: { padding: '12px 10px', borderTop: '1px solid var(--border)' },
   userInfo: { display: 'flex', alignItems: 'center', gap: 10, padding: '8px 6px', marginBottom: 8 },
   avatar: { width: 32, height: 32, borderRadius: '50%', background: 'var(--accent)', color: '#fff', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 14, fontWeight: 700, flexShrink: 0 },
-  logoutBtn: { display: 'flex', alignItems: 'center', gap: 8, width: '100%', padding: '8px 10px', background: 'none', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text3)', fontSize: 13, transition: 'all 0.15s' },
+  actionBtn: { display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, padding: '8px 10px', background: 'none', border: '1px solid var(--border)', borderRadius: 8, color: 'var(--text3)', fontSize: 13, transition: 'all 0.15s' },
 };
