@@ -13,8 +13,8 @@ import java.util.Date;
  * JwtUtils — handles JWT creation, parsing, and validation.
  *
  * Token lifecycle:
- *  1. On login  → generateJwtToken(authentication)
- *  2. On request → validateJwtToken(token) + getUsernameFromJwtToken(token)
+ * 1. On login → generateJwtToken(authentication)
+ * 2. On request → validateJwtToken(token) + getUsernameFromJwtToken(token)
  */
 @Component
 public class JwtUtils {
@@ -24,17 +24,19 @@ public class JwtUtils {
     @Value("${app.jwt.expiration-ms}")
     private int jwtExpirationMs;
 
-    // ── Token Generation ─────────────────────────────────────────────────────
+    // ── Token Generation
     /**
      * Generates a signed JWT for the authenticated user.
      * Subject = username; expiry = now + jwtExpirationMs.
      */
     public String generateJwtToken(Authentication authentication) {
         UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
-        return Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date()).setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs)).signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
+        return Jwts.builder().setSubject(userPrincipal.getUsername()).setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + jwtExpirationMs))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256).compact();
     }
 
-    // ── Token Parsing ────────────────────────────────────────────────────────
+    // ── Token Parsing
     /**
      * Extracts the username (subject) from a valid JWT.
      */
@@ -42,7 +44,7 @@ public class JwtUtils {
         return Jwts.parserBuilder().setSigningKey(getSigningKey()).build().parseClaimsJws(token).getBody().getSubject();
     }
 
-    // ── Token Validation ─────────────────────────────────────────────────────
+    // ── Token Validation
     /**
      * Returns true if the token is well-formed, signed correctly, and not expired.
      * Logs the specific failure reason for debugging.
@@ -63,7 +65,7 @@ public class JwtUtils {
         return false;
     }
 
-    // ── Key Derivation ───────────────────────────────────────────────────────
+    // ── Key Derivation
     private Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(java.util.Base64.getEncoder().encodeToString(jwtSecret.getBytes()));
         return Keys.hmacShaKeyFor(keyBytes);

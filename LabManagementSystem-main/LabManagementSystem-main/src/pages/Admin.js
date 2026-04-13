@@ -3,6 +3,7 @@ import { useAuth } from '../context/AuthContext';
 import { Navigate } from 'react-router-dom';
 import { SUBJECTS } from '../data/placeholders';
 import api from '../api/axios';
+import { Plus, X } from 'lucide-react';
 
 export default function Admin() {
   const { isAdmin } = useAuth();
@@ -88,8 +89,8 @@ function FacultyTab() {
     <div className="card animate-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div className="section-title" style={{ margin: 0 }}>Faculty Members</div>
-        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(pre => !pre)}>
-          {showAddModal ? "✕ Cancel" : "＋ Add Faculty"}
+        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(pre => !pre)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {showAddModal ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add Faculty</>}
         </button>
       </div>
 
@@ -198,8 +199,8 @@ function SubjectsTab() {
     <div className="card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div className="section-title" style={{ margin: 0 }}>Subjects / Courses</div>
-        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(pre => !pre)}>
-          {showAddModal ? "✕ Cancel" : "＋ Add Subject"}
+        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(pre => !pre)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {showAddModal ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add Subject</>}
         </button>
       </div>
 
@@ -591,8 +592,8 @@ function UsersTab() {
     <div className="card">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
         <div className="section-title" style={{ margin: 0 }}>System Users</div>
-        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(pre => !pre)}>
-          {showAddModal ? "✕ Cancel" : "＋ Add User"}
+        <button className="btn btn-primary btn-sm" onClick={() => setShowAddModal(pre => !pre)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {showAddModal ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add User</>}
         </button>
       </div>
 

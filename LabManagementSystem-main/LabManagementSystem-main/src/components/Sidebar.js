@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { LayoutDashboard, Monitor, Users, Calendar, CalendarDays, AlertTriangle, Settings, Hexagon, ChevronLeft, ChevronRight, Power } from 'lucide-react';
 
 const NAV = [
-  { to: '/dashboard',   icon: '⊞', label: 'Dashboard' },
-  { to: '/labs',        icon: '🖥', label: 'Labs & PCs' },
-  { to: '/batches',     icon: '👥', label: 'Batches' },
-  { to: '/schedule',   icon: '📅', label: 'Schedule' },
-  { to: '/timetable',  icon: '🗓', label: 'Timetable' },
-  { to: '/clashes',    icon: '⚠', label: 'Clash Detection' },
+  { to: '/dashboard',   icon: <LayoutDashboard size={18} />, label: 'Dashboard' },
+  { to: '/labs',        icon: <Monitor size={18} />, label: 'Labs & PCs' },
+  { to: '/batches',     icon: <Users size={18} />, label: 'Batches' },
+  { to: '/schedule',    icon: <Calendar size={18} />, label: 'Schedule' },
+  { to: '/timetable',   icon: <CalendarDays size={18} />, label: 'Timetable' },
+  { to: '/clashes',     icon: <AlertTriangle size={18} />, label: 'Clash Detection' },
 ];
 const ADMIN_NAV = [
-  { to: '/admin',      icon: '⚙', label: 'Admin Panel' },
+  { to: '/admin',      icon: <Settings size={18} />, label: 'Admin Panel' },
 ];
 
 export default function Sidebar() {
@@ -27,11 +28,11 @@ export default function Sidebar() {
     <aside style={{ ...styles.aside, width: w, minWidth: w }}>
       <div style={styles.top}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10, padding: collapsed ? '0 14px' : '0 20px', overflow: 'hidden' }}>
-          <span style={{ fontSize: 22, color: 'var(--accent)', flexShrink: 0 }}>⬡</span>
+          <span style={{ color: 'var(--accent)', flexShrink: 0, display: 'flex' }}><Hexagon size={24} /></span>
           {!collapsed && <span style={styles.brand}>LabSync</span>}
         </div>
         <button onClick={() => setCollapsed(c => !c)} style={styles.collapseBtn} title={collapsed ? 'Expand' : 'Collapse'}>
-          {collapsed ? '›' : '‹'}
+          {collapsed ? <ChevronRight size={16}/> : <ChevronLeft size={16}/>}
         </button>
       </div>
 
@@ -67,7 +68,7 @@ export default function Sidebar() {
           </div>
         )}
         <button onClick={handleLogout} style={styles.logoutBtn} title="Logout">
-          <span>⏻</span>
+          <span style={{ display: 'flex', alignItems: 'center' }}><Power size={16}/></span>
           {!collapsed && <span>Logout</span>}
         </button>
       </div>

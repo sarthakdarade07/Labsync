@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { NOTIFICATIONS } from '../data/placeholders';
+import { Landmark, Monitor, Users, BarChart, AlertTriangle, CheckCircle, Info } from 'lucide-react';
 
 export default function Dashboard() {
   const [labs, setLabs] = useState([]);
@@ -9,9 +10,9 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Fetch live lab data on load
-    api.get('/labs').then(response => { if(response.data?.success) setLabs(response.data.data); });
-    api.get('/batches').then(response => { if(response.data?.success) setBatches(response.data.data); });
-    api.get('/schedules').then(response => { if(response.data?.success) setSessions(response.data.data); });
+    api.get('/labs').then(response => { if (response.data?.success) setLabs(response.data.data); });
+    api.get('/batches').then(response => { if (response.data?.success) setBatches(response.data.data); });
+    api.get('/schedules').then(response => { if (response.data?.success) setSessions(response.data.data); });
   }, []);
 
   const totalPCs = labs.reduce((a, l) => a + (l.totalComputers || 0), 0);
@@ -35,10 +36,10 @@ export default function Dashboard() {
       {/* Stats Row */}
       <div className="grid-4" style={{ marginBottom: 24 }}>
         {[
-          { label: 'Total Labs', value: labs.length, color: 'var(--accent)', icon: '🏛' },
-          { label: 'Functional PCs', value: `${functionalPCs}/${totalPCs}`, color: 'var(--success)', icon: '🖥' },
-          { label: 'Active Batches', value: batches.length, color: 'var(--accent3)', icon: '👥' },
-          { label: 'Utilization', value: `${utilization}%`, color: utilization < 85 ? 'var(--warning)' : 'var(--success)', icon: '📊' },
+          { label: 'Total Labs', value: labs.length, color: 'var(--accent)', icon: <Landmark size={20} /> },
+          { label: 'Functional PCs', value: `${functionalPCs}/${totalPCs}`, color: 'var(--success)', icon: <Monitor size={20} /> },
+          { label: 'Active Batches', value: batches.length, color: 'var(--accent3)', icon: <Users size={20} /> },
+          { label: 'Utilization', value: `${utilization}%`, color: utilization < 85 ? 'var(--warning)' : 'var(--success)', icon: <BarChart size={20} /> },
         ].map(s => (
           <div key={s.label} className="card animate-in" style={{ borderLeft: `3px solid ${s.color}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
@@ -54,14 +55,14 @@ export default function Dashboard() {
         {/* Lab Status */}
         <div className="card">
           <div className="section-title">Live Lab Status</div>
-          {labs.length === 0 && <div style={{color: 'var(--text3)'}}>Loading labs data from server...</div>}
+          {labs.length === 0 && <div style={{ color: 'var(--text3)' }}>Loading labs data from server...</div>}
           {labs.map(lab => {
             const name = lab.labName || lab.name || `Lab ${lab.id}`;
             const total = lab.totalComputers || 0;
             const func = lab.workingComputers || 0;
             const pct = total > 0 ? Math.round((func / total) * 100) : 0;
             const col = pct === 100 ? 'var(--success)' : pct >= 80 ? 'var(--accent)' : 'var(--warning)';
-            
+
             return (
               <div key={lab.id} style={styles.labRow}>
                 <div>
@@ -84,7 +85,7 @@ export default function Dashboard() {
           <div className="section-title">Notifications</div>
           {NOTIFICATIONS.map(n => (
             <div key={n.id} style={styles.notif}>
-              <span style={{ fontSize: 18 }}>{n.type === 'warning' ? '⚠️' : n.type === 'success' ? '✅' : 'ℹ️'}</span>
+              <span style={{ display: 'flex', alignItems: 'center' }}>{n.type === 'warning' ? <AlertTriangle size={18} color="var(--warning)" /> : n.type === 'success' ? <CheckCircle size={18} color="var(--success)" /> : <Info size={18} color="var(--info)" />}</span>
               <div>
                 <div style={{ fontSize: 13, color: 'var(--text2)', lineHeight: 1.5 }}>{n.message}</div>
                 <div style={{ fontSize: 11, color: 'var(--text3)', marginTop: 4, fontFamily: 'var(--mono)' }}>{n.time}</div>

@@ -36,8 +36,8 @@ public class GeneticAlgorithm {
     private static final double PENALTY_LAB_CLASH = 0.2;
     private static final double PENALTY_STAFF_CLASH = 0.2;
     private static final double PENALTY_BATCH_CLASH = 0.2;
-    private static final double PENALTY_CAPACITY = 0.1;
-    private static final double PENALTY_WORKING_PCS = 0.1;
+    private static final double PENALTY_CAPACITY = 0.5;
+    private static final double PENALTY_WORKING_PCS = 0.5;
     private static final double PENALTY_OS_MISMATCH = 0.15;
     // ── Tournament selection size ─────────────────────────────────────────────
     private static final int TOURNAMENT_SIZE = 5;
@@ -383,16 +383,38 @@ public class GeneticAlgorithm {
         
         List<Lab> validLabs = new ArrayList<>();
         boolean checkOs = requiredOs != null && !requiredOs.trim().isEmpty() && !requiredOs.equalsIgnoreCase("Any");
+        
         for (Lab l : labs) {
-            if (!checkOs || requiredOs.equalsIgnoreCase(l.getOsType())) {
+            if ((!checkOs || requiredOs.equalsIgnoreCase(l.getOsType())) && l.isAvailable() && l.getWorkingComputers() > 0) {
                 validLabs.add(l);
             }
         }
-        if (validLabs.isEmpty()) {
-            validLabs.addAll(labs);
+        
+        // 1. Try to find the BEST single lab (workingComputers >= requiredCapacity, minimal wasted space)
+        List<Lab> singleLabCandidates = new ArrayList<>();
+        for (Lab l : validLabs) {
+            if (l.getWorkingComputers() >= requiredCapacity) {
+                singleLabCandidates.add(l);
+            }
         }
         
-        Collections.shuffle(validLabs, random);
+        if (!singleLabCandidates.isEmpty()) {
+            // Sort to find the one with capacity closest to requiredCapacity
+            singleLabCandidates.sort(Comparator.comparingInt(Lab::getWorkingComputers));
+            
+            // 80% chance to pick the absolute best, 20% to pick from top 3 to maintain some genetic diversity
+            if (random.nextDouble() < 0.8) {
+                return List.of(singleLabCandidates.get(0));
+            } else {
+                int limit = Math.min(3, singleLabCandidates.size());
+                return List.of(singleLabCandidates.get(random.nextInt(limit)));
+            }
+        }
+        
+        // 2. If no single lab fits, combine multiple labs.
+        // To use the minimum number of labs, sort by workingComputers descending
+        validLabs.sort((l1, l2) -> Integer.compare(l2.getWorkingComputers(), l1.getWorkingComputers()));
+        
         List<Lab> chosenLabs = new ArrayList<>();
         int currentCapacity = 0;
         

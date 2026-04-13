@@ -22,7 +22,7 @@ public class Schedule {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "staff_id", nullable = false)
+    @JoinColumn(name = "staff_id", nullable = true)
     private Staff staff;
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "lab_id", nullable = false)

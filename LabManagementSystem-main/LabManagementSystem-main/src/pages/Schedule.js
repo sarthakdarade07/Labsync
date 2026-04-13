@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
 import { useAuth } from '../context/AuthContext';
+import { Sparkles, Plus, X, Search, AlertTriangle } from 'lucide-react';
 
 export default function Schedule() {
   const { isAdmin } = useAuth();
@@ -37,7 +38,7 @@ export default function Schedule() {
          (s.startTime < f.endTime && s.endTime > f.startTime);
       if (!overlaps) return false;
       if (s.labId.toString() === f.labId.toString()) return true;
-      if (s.staffId.toString() === f.staffId.toString()) return true;
+      if (f.staffId && s.staffId && s.staffId.toString() === f.staffId.toString()) return true;
       if (s.batchId.toString() === f.batchId.toString() && s.subjectId.toString() !== f.subjectId.toString()) return true;
       return false;
     });
@@ -50,14 +51,23 @@ export default function Schedule() {
         return;
     }
     const batch = batchMap[form.batchId];
-    const capacity = batch ? batch.studentCount : 1;
-    const osType = batch ? batch.osRequirement || '' : '';
+    const capacity = batch ? (batch.studentCount || 1) : 1;
+    const osType = batch ? (batch.osRequirement || '') : '';
     
     try {
-        const res = await api.get(`/labs/search-available?dayId=${form.dayId}&startTime=${form.startTime}&endTime=${form.endTime}&capacity=${capacity}&osType=${osType}`);
+        const res = await api.get('/labs/search-available', {
+            params: {
+                dayId: form.dayId,
+                startTime: form.startTime,
+                endTime: form.endTime,
+                capacity: capacity,
+                osType: osType
+            }
+        });
         if(res.data?.success) setAvailableLabs(res.data.data);
     } catch(err) {
-        alert("Error checking availability");
+        console.error("Availability Check Error:", err.response || err);
+        alert(err.response?.data?.message || "Error checking availability");
     }
   };
 
@@ -65,7 +75,6 @@ export default function Schedule() {
     const missing = [];
     if (!form.batchId) missing.push('Batch');
     if (!form.subjectId) missing.push('Subject');
-    if (!form.staffId) missing.push('Faculty');
     if (!form.dayId) missing.push('Day');
     if (!form.startTime) missing.push('Start Time');
     if (!form.endTime) missing.push('End Time');
@@ -74,13 +83,13 @@ export default function Schedule() {
     if (missing.length > 0) return alert(`Fill all fields. Missing: ${missing.join(', ')}`);
     const clashes = detectClash(form);
     if (clashes.length > 0) {
-      alert('⚠ Clash detected! This time slot or lab is already occupied.');
+      alert('Clash detected! This time slot or lab is already occupied.');
       return;
     }
     const batch = batchMap[form.batchId];
     const lab = labMap[form.labId];
     if (batch && lab && batch.studentCount > lab.workingComputers) {
-      if (!window.confirm(`⚠ Batch strength (${batch.studentCount}) exceeds functional PCs (${lab.workingComputers}). Proceed anyway?`)) return;
+      if (!window.confirm(`Batch strength (${batch.studentCount}) exceeds functional PCs (${lab.workingComputers}). Proceed anyway?`)) return;
     }
     try {
       const res = await api.post('/schedules', form);
@@ -110,7 +119,7 @@ export default function Schedule() {
     try {
       const res = await api.post('/admin/regenerate-timetable');
       if(res.data?.success) {
-        alert('✨ ' + res.data.message);
+        alert(res.data.message);
         const r = await api.get('/schedules');
         if(r.data?.success) setSessions(r.data.data);
       }
@@ -130,12 +139,12 @@ export default function Schedule() {
         </div>
         <div style={{ display: 'flex', gap: 10 }}>
           {isAdmin && (
-            <button className="btn btn-secondary" onClick={handleAutoGenerate} disabled={isGenerating}>
-              {isGenerating ? '✨ Generating...' : '✨ Auto-Generate'}
+            <button className="btn btn-secondary" onClick={handleAutoGenerate} disabled={isGenerating} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {isGenerating ? <><Sparkles size={16}/> Generating...</> : <><Sparkles size={16}/> Auto-Generate</>}
             </button>
           )}
-          <button className="btn btn-primary" onClick={() => setShowAdd(s => !s)}>
-            {showAdd ? '✕ Cancel' : '＋ New Session'}
+          <button className="btn btn-primary" onClick={() => setShowAdd(s => !s)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {showAdd ? <><X size={16}/> Cancel</> : <><Plus size={16}/> New Session</>}
           </button>
         </div>
       </div>
@@ -183,7 +192,7 @@ export default function Schedule() {
             <div style={{ gridColumn: '1 / -1' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <label style={styles.label}>Lab {form.labId && labMap[form.labId] ? `(Selected: ${labMap[form.labId].labName})` : '(None Selected)'}</label>
-                <button className="btn btn-secondary btn-sm" onClick={checkAvailability}>🔍 Find Available Labs</button>
+                <button className="btn btn-secondary btn-sm" onClick={checkAvailability} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Search size={14}/> Find Available Labs</button>
               </div>
               {availableLabs && (
                 <div style={{ marginTop: 10, background: 'var(--bg2)', padding: 12, borderRadius: 8, border: '1px solid var(--border)' }} className="animate-in">
@@ -203,7 +212,7 @@ export default function Schedule() {
           {form.batchId && form.labId && (() => {
             const b = batchMap[form.batchId]; const l = labMap[form.labId];
             if (b && l && b.studentCount > l.workingComputers)
-              return <div style={styles.warn}>⚠ Batch strength ({b.studentCount}) exceeds available PCs ({l.workingComputers}) in this lab.</div>;
+              return <div style={styles.warn}><AlertTriangle size={16} style={{marginBottom: -3, marginRight: 6}}/> Batch strength ({b.studentCount}) exceeds available PCs ({l.workingComputers}) in this lab.</div>;
             return null;
           })()}
           <button className="btn btn-primary" onClick={addSession}>Schedule Session</button>
@@ -230,7 +239,7 @@ export default function Schedule() {
                       ? <span className="badge badge-danger">CLASH</span>
                       : <span className="badge badge-success">Confirmed</span>}
                   </td>
-                  <td><button className="btn btn-danger btn-sm" onClick={() => remove(s.scheduleId)}>✕</button></td>
+                  <td><button className="btn btn-danger btn-sm" onClick={() => remove(s.scheduleId)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button></td>
                 </tr>
               );
             })}

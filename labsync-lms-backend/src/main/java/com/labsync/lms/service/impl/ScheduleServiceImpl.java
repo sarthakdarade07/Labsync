@@ -60,7 +60,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         }
         existing.setBatch(fetchBatch(req.getBatchId()));
         existing.setSubject(fetchSubject(req.getSubjectId()));
-        existing.setStaff(fetchStaff(req.getStaffId()));
+        existing.setStaff(req.getStaffId() != null ? fetchStaff(req.getStaffId()) : null);
         existing.setLab(fetchLab(req.getLabId()));
         existing.setDay(fetchDay(req.getDayId()));
         existing.setStartTime(java.time.LocalTime.parse(req.getStartTime()));
@@ -131,7 +131,7 @@ public class ScheduleServiceImpl implements ScheduleService {
         List<String> clashes = new ArrayList<>();
         Batch batch = fetchBatch(req.getBatchId());
         Lab lab = fetchLab(req.getLabId());
-        Staff staff = fetchStaff(req.getStaffId());
+        Staff staff = req.getStaffId() != null ? fetchStaff(req.getStaffId()) : null;
         Long dayId = req.getDayId();
         java.time.LocalTime start = java.time.LocalTime.parse(req.getStartTime());
         java.time.LocalTime end = java.time.LocalTime.parse(req.getEndTime());
@@ -141,7 +141,7 @@ public class ScheduleServiceImpl implements ScheduleService {
             clashes.add(String.format("Lab '%s' is already booked on %s at this time", lab.getLabName(), fetchDay(dayId).getDayName()));
         }
         // ── Rule 2: Staff double-booking ──────────────────────────────────────
-        if (scheduleRepository.hasStaffClash(staff.getId(), dayId, start, end, excludeScheduleId)) {
+        if (staff != null && scheduleRepository.hasStaffClash(staff.getId(), dayId, start, end, excludeScheduleId)) {
             clashes.add(String.format("Staff '%s' is already assigned on %s at this time", staff.getFullName(), fetchDay(dayId).getDayName()));
         }
         // ── Rule 3: Batch double-booking ──────────────────────────────────────
@@ -158,12 +158,12 @@ public class ScheduleServiceImpl implements ScheduleService {
     // ── DTO Mapping ───────────────────────────────────────────────────────────
     @Override
     public ScheduleResponse toResponse(Schedule s) {
-        return ScheduleResponse.builder().scheduleId(s.getId()).batchId(s.getBatch().getId()).batchName(s.getBatch().getBatchName()).division(s.getBatch().getDivision()).subjectId(s.getSubject().getId()).subjectName(s.getSubject().getName()).subjectCode(s.getSubject().getSubjectCode()).staffId(s.getStaff().getId()).staffName(s.getStaff().getFullName()).labId(s.getLab().getId()).labName(s.getLab().getLabName()).dayId(s.getDay().getId()).dayName(s.getDay().getDayName()).dayOrder(s.getDay().getDayOrder()).slotLabel(s.getStartTime() + " - " + s.getEndTime()).startTime(s.getStartTime()).endTime(s.getEndTime()).generatedByGA(s.isGeneratedByGA()).build();
+        return ScheduleResponse.builder().scheduleId(s.getId()).batchId(s.getBatch().getId()).batchName(s.getBatch().getBatchName()).division(s.getBatch().getDivision()).subjectId(s.getSubject().getId()).subjectName(s.getSubject().getName()).subjectCode(s.getSubject().getSubjectCode()).staffId(s.getStaff() != null ? s.getStaff().getId() : null).staffName(s.getStaff() != null ? s.getStaff().getFullName() : "No Faculty").labId(s.getLab().getId()).labName(s.getLab().getLabName()).dayId(s.getDay().getId()).dayName(s.getDay().getDayName()).dayOrder(s.getDay().getDayOrder()).slotLabel(s.getStartTime() + " - " + s.getEndTime()).startTime(s.getStartTime()).endTime(s.getEndTime()).generatedByGA(s.isGeneratedByGA()).build();
     }
 
     // ── Internal Helpers ──────────────────────────────────────────────────────
     private Schedule buildSchedule(ScheduleRequest req) {
-        return Schedule.builder().batch(fetchBatch(req.getBatchId())).subject(fetchSubject(req.getSubjectId())).staff(fetchStaff(req.getStaffId())).lab(fetchLab(req.getLabId())).day(fetchDay(req.getDayId())).startTime(java.time.LocalTime.parse(req.getStartTime())).endTime(java.time.LocalTime.parse(req.getEndTime())).active(true).generatedByGA(false).build();
+        return Schedule.builder().batch(fetchBatch(req.getBatchId())).subject(fetchSubject(req.getSubjectId())).staff(req.getStaffId() != null ? fetchStaff(req.getStaffId()) : null).lab(fetchLab(req.getLabId())).day(fetchDay(req.getDayId())).startTime(java.time.LocalTime.parse(req.getStartTime())).endTime(java.time.LocalTime.parse(req.getEndTime())).active(true).generatedByGA(false).build();
     }
 
 

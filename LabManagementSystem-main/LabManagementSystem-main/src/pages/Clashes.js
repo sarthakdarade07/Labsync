@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
+import { AlertTriangle, CheckCircle, Landmark, Users, Monitor } from 'lucide-react';
 
 export default function Clashes() {
   const [batches, setBatches] = useState([]);
@@ -57,17 +58,17 @@ export default function Clashes() {
         </div>
         <div style={{ display: 'flex', gap: 8 }}>
           {totalIssues === 0
-            ? <span className="badge badge-success">✓ No Issues Found</span>
-            : <span className="badge badge-danger">⚠ {totalIssues} Issue{totalIssues > 1 ? 's' : ''} Found</span>}
+            ? <span className="badge badge-success" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><CheckCircle size={14}/> No Issues Found</span>
+            : <span className="badge badge-danger" style={{ display: 'flex', alignItems: 'center', gap: 4 }}><AlertTriangle size={14}/> {totalIssues} Issue{totalIssues > 1 ? 's' : ''} Found</span>}
         </div>
       </div>
 
       {/* Summary Cards */}
       <div className="grid-3" style={{ marginBottom: 24 }}>
         {[
-          { label: 'Lab Conflicts', count: labClashes.length, icon: '🏛', col: labClashes.length > 0 ? 'var(--danger)' : 'var(--success)' },
-          { label: 'Batch Conflicts', count: batchClashes.length, icon: '👥', col: batchClashes.length > 0 ? 'var(--danger)' : 'var(--success)' },
-          { label: 'Capacity Issues', count: capacityIssues.length, icon: '💻', col: capacityIssues.length > 0 ? 'var(--warning)' : 'var(--success)' },
+          { label: 'Lab Conflicts', count: labClashes.length, icon: <Landmark size={24} />, col: labClashes.length > 0 ? 'var(--danger)' : 'var(--success)' },
+          { label: 'Batch Conflicts', count: batchClashes.length, icon: <Users size={24} />, col: batchClashes.length > 0 ? 'var(--danger)' : 'var(--success)' },
+          { label: 'Capacity Issues', count: capacityIssues.length, icon: <Monitor size={24} />, col: capacityIssues.length > 0 ? 'var(--warning)' : 'var(--success)' },
         ].map(s => (
           <div key={s.label} className="card" style={{ borderLeft: `3px solid ${s.col}` }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 12 }}>
@@ -104,7 +105,7 @@ export default function Clashes() {
             const lab = labMap[s.labId];
             return (
               <div key={s.scheduleId} style={styles.clashRow}>
-                <span style={{ fontSize: 18 }}>⚠️</span>
+                <span style={{ display: 'flex', alignItems: 'center' }}><AlertTriangle size={20} color="var(--warning)" /></span>
                 <div>
                   <div style={{ color: 'var(--warning)', fontWeight: 600, fontSize: 14 }}>
                     {batch?.batchName} → {lab?.labName}
@@ -121,7 +122,7 @@ export default function Clashes() {
 
       {totalIssues === 0 && (
         <div className="card" style={{ textAlign: 'center', padding: 48 }}>
-          <div style={{ fontSize: 40, marginBottom: 12 }}>✅</div>
+          <div style={{ marginBottom: 12, display: 'flex', justifyContent: 'center' }}><CheckCircle size={48} color="var(--success)" /></div>
           <div style={{ fontSize: 16, fontWeight: 600, color: 'var(--success)' }}>All Clear!</div>
           <div style={{ color: 'var(--text3)', marginTop: 8, fontSize: 14 }}>No conflicts or capacity issues detected in the current schedule.</div>
         </div>
@@ -133,7 +134,7 @@ export default function Clashes() {
 function ClashRow({ c }) {
   return (
     <div style={styles.clashRow}>
-      <span style={{ fontSize: 18 }}>🚨</span>
+      <span style={{ display: 'flex', alignItems: 'center' }}><AlertTriangle size={20} color="var(--danger)" /></span>
       <div>
         <div style={{ color: 'var(--danger)', fontWeight: 600, fontSize: 14 }}>{c.detail}</div>
         <div style={{ color: 'var(--text3)', fontSize: 12, marginTop: 2 }}>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { Plus, Monitor } from 'lucide-react';
 import api from '../api/axios';
+import { useAuth } from '../context/AuthContext';
 
 export default function Labs() {
+  const { isAdmin } = useAuth();
   const [labs, setLabs] = useState([]);
   const [editing, setEditing] = useState(null);
   const [form, setForm] = useState({});
@@ -24,20 +26,39 @@ export default function Labs() {
     }
   };
 
-  const startEdit = lab => { setEditing(lab.id); setForm({ ...lab }); };
+  const startEdit = lab => { setEditing(lab.id); setForm({ ...lab, name: lab.labName || lab.name, totalPCs: lab.totalComputers, functionalPCs: lab.workingComputers }); };
   const cancelEdit = () => { setEditing(null); setForm({}); };
   const saveEdit = async () => {
     try {
-      // Assuming a PUT /labs/{id} or PATCH endpoint exists
-      await api.patch(`/labs/${editing}/computers`, {
-        workingComputers: +form.functionalPCs || +form.workingComputers,
-        faultyComputers: (+form.totalPCs - (+form.functionalPCs || +form.workingComputers)) || 0
-      });
+      const working = (form.functionalPCs !== undefined && form.functionalPCs !== '') ? +form.functionalPCs : +form.workingComputers;
+      const total = (form.totalPCs !== undefined && form.totalPCs !== '') ? +form.totalPCs : +form.totalComputers;
+      const faulty = Math.max(0, total - working);
+      
+      if (!isAdmin) {
+        // Staff can only update computer counts
+        await api.patch(`/labs/${editing}/computers`, {
+          workingComputers: working,
+          faultyComputers: faulty
+        });
+      } else {
+        // Admins can update the entire lab details
+        const payload = {
+          labName: form.name || form.labName,
+          location: form.location,
+          osType: form.osType,
+          capacity: form.capacity || 1,
+          totalComputers: total,
+          workingComputers: working,
+          faultyComputers: faulty
+        };
+        await api.put(`/labs/${editing}`, payload);
+      }
+      
       fetchLabs();
       setEditing(null);
     } catch (error) {
       console.error("Error saving edit", error);
-      alert('Failed to update lab status');
+      alert(error.response?.data?.message || 'Failed to update lab status');
     }
   };
 
@@ -80,7 +101,9 @@ export default function Labs() {
           <div className="section-title">Infrastructure</div>
           <h1 className="page-title">Labs &amp; PCs</h1>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Plus size={16} /> Add Lab</button>
+        {isAdmin && (
+          <button className="btn btn-primary" onClick={() => setShowAddModal(true)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Plus size={16} /> Add Lab</button>
+        )}
       </div>
 
       <div className="grid-3" style={{ marginBottom: 28 }}>
@@ -122,11 +145,15 @@ export default function Labs() {
               {isEditing ? (
                 <div style={{ display: 'flex', flexDirection: 'column', gap: 10 }}>
                   <div className="section-title">Editing #{id}</div>
-                  <input placeholder="Lab Name" disabled value={name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
-                  <input placeholder="Location" disabled value={location} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
+                  {isAdmin && (
+                    <>
+                      <input placeholder="Lab Name" value={form.name || ''} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
+                      <input placeholder="Location" value={form.location || ''} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
+                    </>
+                  )}
                   <div className="grid-2">
-                    <input type="number" disabled placeholder="Total PCs" value={form.totalPCs || form.totalComputers} onChange={e => setForm(p => ({ ...p, totalPCs: e.target.value }))} />
-                    <input type="number" placeholder="Functional PCs" value={form.functionalPCs || form.workingComputers} onChange={e => setForm(p => ({ ...p, functionalPCs: e.target.value }))} />
+                    <input type="number" placeholder="Total PCs" disabled={!isAdmin} value={form.totalPCs !== undefined ? form.totalPCs : form.totalComputers} onChange={e => setForm(p => ({ ...p, totalPCs: e.target.value }))} />
+                    <input type="number" placeholder="Functional PCs" value={form.functionalPCs !== undefined ? form.functionalPCs : form.workingComputers} onChange={e => setForm(p => ({ ...p, functionalPCs: e.target.value }))} />
                   </div>
                   <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
                     <button className="btn btn-primary btn-sm" onClick={saveEdit}>Save</button>

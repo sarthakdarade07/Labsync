@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
+import { X, Plus } from 'lucide-react';
 
 export default function Batches() {
   const [batches, setBatches] = useState([]);
@@ -52,8 +53,8 @@ export default function Batches() {
           <div className="section-title">Academic Groups</div>
           <h1 className="page-title">Batches</h1>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAdd(s => !s)}>
-          {showAdd ? '✕ Cancel' : '＋ Add Batch'}
+        <button className="btn btn-primary" onClick={() => setShowAdd(s => !s)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+          {showAdd ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add Batch</>}
         </button>
       </div>
 

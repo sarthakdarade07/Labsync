@@ -10,7 +10,6 @@ public class ScheduleRequest {
     private Long batchId;
     @NotNull
     private Long subjectId;
-    @NotNull
     private Long staffId;
     @NotNull
     private Long labId;

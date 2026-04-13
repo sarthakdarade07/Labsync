@@ -32,7 +32,7 @@ public interface LabRepository extends JpaRepository<Lab, Long> {
                 WHERE s.day.id = :dayId AND s.active = true
                   AND (s.startTime < :endTime AND s.endTime > :startTime)
             ) AND l.available = true AND l.workingComputers >= :requiredComputers
-              AND (:osType IS NULL OR :osType = '' OR l.osType = :osType)
+              AND (:osType = '' OR l.osType = :osType)
             """)
     List<Lab> findAvailableLabsForSession(
             @Param("dayId") Long dayId,

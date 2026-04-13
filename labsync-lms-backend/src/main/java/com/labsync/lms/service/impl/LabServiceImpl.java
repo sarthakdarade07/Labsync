@@ -120,7 +120,7 @@ public class LabServiceImpl implements LabService {
         java.time.LocalTime start = java.time.LocalTime.parse(startTime);
         java.time.LocalTime end = java.time.LocalTime.parse(endTime);
         int reqComps = requiredComputers != null ? requiredComputers : 1;
-        String reqOs = (osType != null && !osType.equalsIgnoreCase("Any")) ? osType : null;
+        String reqOs = (osType != null && !osType.equalsIgnoreCase("Any") && !osType.trim().isEmpty()) ? osType : "";
         return labRepository.findAvailableLabsForSession(dayId, start, end, reqComps, reqOs);
     }
 
