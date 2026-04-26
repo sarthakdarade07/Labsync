@@ -26,7 +26,7 @@ public class DayController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Day>> updateDay(@PathVariable Long id, @RequestBody Day updateDto) {
+    public ResponseEntity<ApiResponse<Day>> updateDay(@PathVariable("id") Long id, @RequestBody Day updateDto) {
         Day day = dayRepository.findById(id).orElseThrow(() -> new RuntimeException("Day not found"));
         day.setStartTime(updateDto.getStartTime());
         day.setEndTime(updateDto.getEndTime());

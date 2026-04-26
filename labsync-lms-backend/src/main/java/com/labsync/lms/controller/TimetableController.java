@@ -40,7 +40,7 @@ public class TimetableController {
      * Returns the weekly timetable for a batch, organised as a map of day → sessions.
      */
     @GetMapping("/batch/{batchId}")
-    public ResponseEntity<ApiResponse<Map<String, List<ScheduleResponse>>>> getTimetableByBatch(@PathVariable Long batchId) {
+    public ResponseEntity<ApiResponse<Map<String, List<ScheduleResponse>>>> getTimetableByBatch(@PathVariable("batchId") Long batchId) {
         Map<String, List<ScheduleResponse>> timetable = timetableService.getTimetableByBatch(batchId);
         return ResponseEntity.ok(ApiResponse.success("Timetable fetched for batch id=" + batchId, timetable));
     }
@@ -50,7 +50,7 @@ public class TimetableController {
      * Returns all sessions scheduled for a specific day (across all batches).
      */
     @GetMapping("/day/{dayId}")
-    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getTimetableByDay(@PathVariable Long dayId) {
+    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getTimetableByDay(@PathVariable("dayId") Long dayId) {
         return ResponseEntity.ok(ApiResponse.success(timetableService.getTimetableByDay(dayId)));
     }
 

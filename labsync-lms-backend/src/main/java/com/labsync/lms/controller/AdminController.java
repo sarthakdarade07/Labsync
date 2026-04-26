@@ -67,7 +67,7 @@ public class AdminController {
      * Use this when you ran the GA with applyResult=false and want to apply later.
      */
     @PostMapping("/apply-ga-result/{runId}")
-    public ResponseEntity<ApiResponse<Void>> applyGaResult(@PathVariable Long runId) {
+    public ResponseEntity<ApiResponse<Void>> applyGaResult(@PathVariable("runId") Long runId) {
         timetableService.applyGaResult(runId);
         return ResponseEntity.ok(ApiResponse.success("GA run id=" + runId + " applied to live schedule", null));
     }
@@ -98,7 +98,7 @@ public class AdminController {
      * Returns details of a specific GA run.
      */
     @GetMapping("/ga-history/{id}")
-    public ResponseEntity<ApiResponse<AlgorithmRun>> getGaRunById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<AlgorithmRun>> getGaRunById(@PathVariable("id") Long id) {
         List<AlgorithmRun> history = timetableService.getAlgorithmRunHistory();
         AlgorithmRun run = history.stream().filter(r -> r.getId().equals(id)).findFirst().orElseThrow(() -> new com.labsync.lms.exception.ResourceNotFoundException("AlgorithmRun", "id", id));
         return ResponseEntity.ok(ApiResponse.success(run));

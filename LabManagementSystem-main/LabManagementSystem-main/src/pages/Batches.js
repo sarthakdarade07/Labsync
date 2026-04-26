@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import api from '../api/axios';
-import { X, Plus } from 'lucide-react';
+import { X, Plus, Edit2 } from 'lucide-react';
+import { useAuth } from '../context/AuthContext';
 
 export default function Batches() {
+  const { isAdmin } = useAuth();
   const [batches, setBatches] = useState([]);
   const [showAdd, setShowAdd] = useState(false);
+  const [editing, setEditing] = useState(null);
   const [labs, setLabs] = useState([]);
   const [subjects, setSubjects] = useState([]);
   const [form, setForm] = useState({ batchName: '', division: '', semester: 'SEM-3', studentCount: '', osRequirement: 'Any', labsPerWeek: 1, totalHours: '', startTime: '', endTime: '', subjectIds: [] });
@@ -18,7 +21,30 @@ export default function Batches() {
 
   const uniqueOs = Array.from(new Set(labs.map(l => l.osType).filter(Boolean)));
 
-  const addBatch = async () => {
+  const startEdit = (b) => {
+    setEditing(b.id);
+    setShowAdd(true);
+    setForm({
+      batchName: b.batchName || '',
+      division: b.division || '',
+      semester: b.semester || 'SEM-3',
+      studentCount: b.studentCount || '',
+      osRequirement: b.osRequirement || 'Any',
+      labsPerWeek: b.labsPerWeek || 1,
+      totalHours: b.totalHours || '',
+      startTime: b.startTime || '',
+      endTime: b.endTime || '',
+      subjectIds: b.subjects ? b.subjects.map(s => s.id) : []
+    });
+  };
+
+  const cancelForm = () => {
+    setShowAdd(false);
+    setEditing(null);
+    setForm({ batchName: '', division: '', semester: 'SEM-3', studentCount: '', osRequirement: 'Any', labsPerWeek: 1, totalHours: '', startTime: '', endTime: '', subjectIds: [] });
+  };
+
+  const saveBatch = async () => {
     if (!form.batchName) return;
     try {
       const payload = { ...form, programId: 1, academicYearId: 1 };
@@ -28,22 +54,35 @@ export default function Batches() {
       if (!payload.totalHours) payload.totalHours = null;
       if (!payload.labsPerWeek) payload.labsPerWeek = 1;
 
-      const res = await api.post('/batches', payload);
-      if (res.data?.success) {
-        setForm({ batchName: '', division: '', semester: 'SEM-3', studentCount: '', osRequirement: 'Any', labsPerWeek: 1, totalHours: '', startTime: '', endTime: '', subjectIds: [] });
-        setShowAdd(false);
-        fetchBatches();
+      if (editing) {
+        const res = await api.put(`/batches/${editing}`, payload);
+        if (res.data?.success) {
+          cancelForm();
+          fetchBatches();
+        }
+      } else {
+        const res = await api.post('/batches', payload);
+        if (res.data?.success) {
+          cancelForm();
+          fetchBatches();
+        }
       }
-    } catch (e) {}
+    } catch (e) {
+      console.error(e);
+      alert(e.response?.data?.message || e.message || "Error saving batch");
+    }
   };
 
   const remove = async id => {
     try {
-      if(window.confirm("Are you sure?")) {
+      if(window.confirm("Are you sure? This will fail if there are linked schedules or students.")) {
         await api.delete(`/batches/${id}`);
         fetchBatches();
       }
-    } catch(e) {}
+    } catch(e) {
+      console.error("Delete Error:", e);
+      alert(e.response?.data?.message || e.message || "Error deleting batch. It may have linked students or schedules.");
+    }
   };
 
   return (
@@ -53,14 +92,16 @@ export default function Batches() {
           <div className="section-title">Academic Groups</div>
           <h1 className="page-title">Batches</h1>
         </div>
-        <button className="btn btn-primary" onClick={() => setShowAdd(s => !s)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {showAdd ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add Batch</>}
-        </button>
+        {isAdmin && (
+          <button className="btn btn-primary" onClick={() => !showAdd ? setShowAdd(true) : cancelForm()} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            {showAdd ? <><X size={16} /> Cancel</> : <><Plus size={16} /> Add Batch</>}
+          </button>
+        )}
       </div>
 
       {showAdd && (
-        <div className="card" style={{ marginBottom: 24 }}>
-          <div className="section-title">New Batch</div>
+        <div className="card" style={{ marginBottom: 24, borderLeft: editing ? '3px solid var(--accent)' : '3px solid var(--success)' }}>
+          <div className="section-title">{editing ? `Edit Batch #${editing}` : 'New Batch'}</div>
           <div className="grid-3" style={{ gap: 12, marginBottom: 14 }}>
             <div><label style={styles.label}>Batch Name</label><input placeholder="e.g. Batch A1" value={form.batchName} onChange={e => setForm(p => ({ ...p, batchName: e.target.value }))} /></div>
             <div><label style={styles.label}>Division</label><input placeholder="e.g. CSE-A" value={form.division} onChange={e => setForm(p => ({ ...p, division: e.target.value }))} /></div>
@@ -69,7 +110,7 @@ export default function Batches() {
                 <option value="SEM-1">SEM-1</option><option value="SEM-3">SEM-3</option><option value="SEM-5">SEM-5</option><option value="SEM-7">SEM-7</option>
               </select>
             </div>
-            <div><label style={styles.label}>Strength</label><input type="number" placeholder="e.g. 30" value={form.studentCount} onChange={e => setForm(p => ({ ...p, studentCount: parseInt(e.target.value)||30 }))} /></div>
+            <div><label style={styles.label}>Strength</label><input type="number" placeholder="e.g. 30" value={form.studentCount} onChange={e => setForm(p => ({ ...p, studentCount: parseInt(e.target.value)||'' }))} /></div>
             <div><label style={styles.label}>OS Req</label>
               <select value={form.osRequirement} onChange={e => setForm(p => ({ ...p, osRequirement: e.target.value }))}>
                 <option value="Any">Any</option>
@@ -97,14 +138,14 @@ export default function Batches() {
             </div>
     
           </div>
-          <button className="btn btn-primary" onClick={addBatch}>Add Batch</button>
+          <button className="btn btn-primary" onClick={saveBatch}>{editing ? 'Save Changes' : 'Add Batch'}</button>
         </div>
       )}
 
       <div className="card">
         <div className="section-title">All Batches — {batches.length} groups</div>
         <table>
-          <thead><tr><th>Batch ID</th><th>Name</th><th>Division</th><th>Year</th><th>Strength</th><th>OS</th><th>Subjects</th><th>Labs/Wk</th><th>Time (Start-End) / Hrs</th><th>Actions</th></tr></thead>
+          <thead><tr><th>Batch ID</th><th>Name</th><th>Division</th><th>Year</th><th>Strength</th><th>OS</th><th>Subjects</th><th>Labs/Wk</th><th>Time (Start-End) / Hrs</th>{isAdmin && <th>Actions</th>}</tr></thead>
           <tbody>
             {batches.map(b => (
               <tr key={b.id}>
@@ -122,9 +163,14 @@ export default function Batches() {
                   ({b.totalHours ? b.totalHours + 'h' : 'N/A'})
                 </td>
     
-                <td>
-                  <button className="btn btn-danger btn-sm" onClick={() => remove(b.id)}>Remove</button>
-                </td>
+                {isAdmin && (
+                  <td>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      <button className="btn btn-secondary btn-sm" onClick={() => startEdit(b)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Edit"><Edit2 size={14} /></button>
+                      <button className="btn btn-danger btn-sm" onClick={() => remove(b.id)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="Remove"><X size={14} /></button>
+                    </div>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -139,3 +185,4 @@ const styles = {
   header: { display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 28 },
   label: { display: 'block', fontSize: 11, fontFamily: 'var(--mono)', textTransform: 'uppercase', letterSpacing: 0.5, color: 'var(--text3)', marginBottom: 6 },
 };
+

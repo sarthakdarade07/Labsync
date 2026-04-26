@@ -83,37 +83,37 @@ public class ScheduleController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<ScheduleResponse>> updateSchedule(@PathVariable Long id, @Valid @RequestBody ScheduleRequest request) {
+    public ResponseEntity<ApiResponse<ScheduleResponse>> updateSchedule(@PathVariable("id") Long id, @Valid @RequestBody ScheduleRequest request) {
         Schedule updated = scheduleService.updateSchedule(id, request);
         return ResponseEntity.ok(ApiResponse.success("Schedule updated", scheduleService.toResponse(updated)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<Void>> deleteSchedule(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteSchedule(@PathVariable("id") Long id) {
         scheduleService.deleteSchedule(id);
         return ResponseEntity.ok(ApiResponse.success("Schedule deleted", null));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<ScheduleResponse>> getScheduleById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ScheduleResponse>> getScheduleById(@PathVariable("id") Long id) {
         Schedule s = scheduleService.getScheduleById(id);
         return ResponseEntity.ok(ApiResponse.success(scheduleService.toResponse(s)));
     }
 
     // ── Filtered views ─────────────────────────────────────────────────────────
     @GetMapping("/batch/{batchId}")
-    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getByBatch(@PathVariable Long batchId) {
+    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getByBatch(@PathVariable("batchId") Long batchId) {
         return ResponseEntity.ok(ApiResponse.success(scheduleService.getSchedulesByBatch(batchId)));
     }
 
     @GetMapping("/day/{dayId}")
-    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getByDay(@PathVariable Long dayId) {
+    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getByDay(@PathVariable("dayId") Long dayId) {
         return ResponseEntity.ok(ApiResponse.success(scheduleService.getSchedulesByDay(dayId)));
     }
 
     @GetMapping("/lab/{labId}")
-    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getByLab(@PathVariable Long labId) {
+    public ResponseEntity<ApiResponse<List<ScheduleResponse>>> getByLab(@PathVariable("labId") Long labId) {
         return ResponseEntity.ok(ApiResponse.success(scheduleService.getSchedulesByLab(labId)));
     }
 

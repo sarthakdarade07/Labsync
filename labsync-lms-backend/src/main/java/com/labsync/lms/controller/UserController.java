@@ -26,13 +26,13 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         return ResponseEntity.ok(ApiResponse.success("User deleted successfully", null));
     }
 
     @PutMapping("/{id}/password")
-    public ResponseEntity<ApiResponse<Void>> changePassword(@PathVariable Long id, @RequestBody java.util.Map<String, String> body) {
+    public ResponseEntity<ApiResponse<Void>> changePassword(@PathVariable("id") Long id, @RequestBody java.util.Map<String, String> body) {
         String newPassword = body.get("password");
         if (newPassword == null || newPassword.trim().isEmpty()) {
             throw new IllegalArgumentException("Password cannot be empty");

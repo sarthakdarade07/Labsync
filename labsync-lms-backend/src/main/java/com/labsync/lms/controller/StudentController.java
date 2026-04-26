@@ -46,17 +46,17 @@ public class StudentController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Student>> getStudentById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Student>> getStudentById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ApiResponse.success(studentService.getStudentById(id)));
     }
 
     @GetMapping("/prn/{prn}")
-    public ResponseEntity<ApiResponse<Student>> getStudentByPrn(@PathVariable String prn) {
+    public ResponseEntity<ApiResponse<Student>> getStudentByPrn(@PathVariable("prn") String prn) {
         return ResponseEntity.ok(ApiResponse.success(studentService.getStudentByPrn(prn)));
     }
 
     @GetMapping("/batch/{batchId}")
-    public ResponseEntity<ApiResponse<List<Student>>> getStudentsByBatch(@PathVariable Long batchId) {
+    public ResponseEntity<ApiResponse<List<Student>>> getStudentsByBatch(@PathVariable("batchId") Long batchId) {
         return ResponseEntity.ok(ApiResponse.success(studentService.getStudentsByBatch(batchId)));
     }
 
@@ -69,13 +69,13 @@ public class StudentController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<Student>> updateStudent(@PathVariable Long id, @Valid @RequestBody StudentRequest request) {
+    public ResponseEntity<ApiResponse<Student>> updateStudent(@PathVariable("id") Long id, @Valid @RequestBody StudentRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Student updated", studentService.updateStudent(id, request)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<Void>> deleteStudent(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteStudent(@PathVariable("id") Long id) {
         studentService.deleteStudent(id);
         return ResponseEntity.ok(ApiResponse.success("Student deleted", null));
     }

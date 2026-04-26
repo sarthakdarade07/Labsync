@@ -53,7 +53,7 @@ public class LabController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Lab>> getLabById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Lab>> getLabById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ApiResponse.success(labService.getLabById(id)));
     }
 
@@ -66,13 +66,13 @@ public class LabController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<Lab>> updateLab(@PathVariable Long id, @Valid @RequestBody LabRequest request) {
+    public ResponseEntity<ApiResponse<Lab>> updateLab(@PathVariable("id") Long id, @Valid @RequestBody LabRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Lab updated", labService.updateLab(id, request)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<Void>> deleteLab(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteLab(@PathVariable("id") Long id) {
         labService.deleteLab(id);
         return ResponseEntity.ok(ApiResponse.success("Lab deleted", null));
     }
@@ -84,7 +84,7 @@ public class LabController {
     }
 
     @GetMapping("/{id}/availability")
-    public ResponseEntity<ApiResponse<LabAvailabilityResponse>> getLabAvailability(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<LabAvailabilityResponse>> getLabAvailability(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ApiResponse.success(labService.getLabAvailability(id)));
     }
 
@@ -93,7 +93,7 @@ public class LabController {
      * Staff or Admin can update working/faulty computer counts after each session.
      */
     @PatchMapping("/{id}/computers")
-    public ResponseEntity<ApiResponse<Lab>> updateComputerStatus(@PathVariable Long id, @Valid @RequestBody ComputerStatusRequest request) {
+    public ResponseEntity<ApiResponse<Lab>> updateComputerStatus(@PathVariable("id") Long id, @Valid @RequestBody ComputerStatusRequest request) {
         Lab updated = labService.updateComputerStatus(id, request);
         return ResponseEntity.ok(ApiResponse.success("Computer status updated", updated));
     }
@@ -104,11 +104,11 @@ public class LabController {
      */
     @GetMapping("/search-available")
     public ResponseEntity<ApiResponse<List<Lab>>> searchAvailableLabs(
-            @RequestParam Long dayId,
-            @RequestParam String startTime,
-            @RequestParam String endTime,
-            @RequestParam(required = false, defaultValue = "1") Integer capacity,
-            @RequestParam(required = false) String osType) {
+            @RequestParam("dayId") Long dayId,
+            @RequestParam("startTime") String startTime,
+            @RequestParam("endTime") String endTime,
+            @RequestParam(value = "capacity", required = false, defaultValue = "1") Integer capacity,
+            @RequestParam(value = "osType", required = false) String osType) {
         return ResponseEntity.ok(ApiResponse.success(labService.searchAvailableLabs(dayId, startTime, endTime, capacity, osType)));
     }
 

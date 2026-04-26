@@ -36,12 +36,12 @@ public class BatchController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Batch>> getBatchById(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Batch>> getBatchById(@PathVariable("id") Long id) {
         return ResponseEntity.ok(ApiResponse.success(batchService.getBatchById(id)));
     }
 
     @GetMapping("/program/{programId}")
-    public ResponseEntity<ApiResponse<List<Batch>>> getBatchesByProgram(@PathVariable Long programId) {
+    public ResponseEntity<ApiResponse<List<Batch>>> getBatchesByProgram(@PathVariable("programId") Long programId) {
         return ResponseEntity.ok(ApiResponse.success(batchService.getBatchesByProgram(programId)));
     }
 
@@ -54,13 +54,13 @@ public class BatchController {
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<Batch>> updateBatch(@PathVariable Long id, @Valid @RequestBody BatchRequest request) {
+    public ResponseEntity<ApiResponse<Batch>> updateBatch(@PathVariable("id") Long id, @Valid @RequestBody BatchRequest request) {
         return ResponseEntity.ok(ApiResponse.success("Batch updated", batchService.updateBatch(id, request)));
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole(\'ADMIN\')")
-    public ResponseEntity<ApiResponse<Void>> deleteBatch(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteBatch(@PathVariable("id") Long id) {
         batchService.deleteBatch(id);
         return ResponseEntity.ok(ApiResponse.success("Batch deleted", null));
     }

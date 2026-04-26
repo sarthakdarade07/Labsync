@@ -109,7 +109,10 @@ export default function Schedule() {
       try {
         await api.delete(`/schedules/${id}`);
         api.get('/schedules').then(r => { if(r.data?.success) setSessions(r.data.data); });
-      } catch(e) {}
+      } catch(e) {
+        console.error("Delete Error:", e);
+        alert(e.response?.data?.message || e.message || "Error deleting session");
+      }
     }
   };
 
@@ -143,9 +146,11 @@ export default function Schedule() {
               {isGenerating ? <><Sparkles size={16}/> Generating...</> : <><Sparkles size={16}/> Auto-Generate</>}
             </button>
           )}
-          <button className="btn btn-primary" onClick={() => setShowAdd(s => !s)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            {showAdd ? <><X size={16}/> Cancel</> : <><Plus size={16}/> New Session</>}
-          </button>
+          {isAdmin && (
+            <button className="btn btn-primary" onClick={() => setShowAdd(s => !s)} style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+              {showAdd ? <><X size={16}/> Cancel</> : <><Plus size={16}/> New Session</>}
+            </button>
+          )}
         </div>
       </div>
 
@@ -239,7 +244,11 @@ export default function Schedule() {
                       ? <span className="badge badge-danger">CLASH</span>
                       : <span className="badge badge-success">Confirmed</span>}
                   </td>
-                  <td><button className="btn btn-danger btn-sm" onClick={() => remove(s.scheduleId)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button></td>
+                  <td>
+                    {isAdmin && (
+                      <button className="btn btn-danger btn-sm" onClick={() => remove(s.scheduleId)} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}><X size={14} /></button>
+                    )}
+                  </td>
                 </tr>
               );
             })}

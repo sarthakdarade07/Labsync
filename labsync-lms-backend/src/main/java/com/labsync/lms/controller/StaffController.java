@@ -33,13 +33,13 @@ public class StaffController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Staff>> updateStaff(@PathVariable Long id, @Valid @RequestBody StaffRequest request) {
+    public ResponseEntity<ApiResponse<Staff>> updateStaff(@PathVariable("id") Long id, @Valid @RequestBody StaffRequest request) {
         Staff updated = staffService.updateStaff(id, request);
         return ResponseEntity.ok(ApiResponse.success("Staff updated successfully", updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteStaff(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteStaff(@PathVariable("id") Long id) {
         staffService.deleteStaff(id);
         return ResponseEntity.ok(ApiResponse.success("Staff deleted successfully", null));
     }

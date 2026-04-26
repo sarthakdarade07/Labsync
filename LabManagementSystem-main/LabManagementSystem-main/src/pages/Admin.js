@@ -272,10 +272,10 @@ function SettingsTab() {
 
   useEffect(() => {
     api.get('/days').then(res => { if (res.data?.success) setDays(res.data.data); });
-    api.get('/settings').then(res => { 
+    api.get('/settings').then(res => {
       if (res.data?.success && Object.keys(res.data.data).length > 0) {
-        setSettings(pre => ({...pre, ...res.data.data}));
-      } 
+        setSettings(pre => ({ ...pre, ...res.data.data }));
+      }
     });
   }, []);
 
@@ -326,16 +326,16 @@ function SettingsTab() {
         ].map(f => (
           <div key={f.key}>
             <label style={styles.label}>{f.label}</label>
-            <input 
-               value={settings[f.key]} 
-               onChange={e => setSettings(p => ({...p, [f.key]: e.target.value}))} 
+            <input
+              value={settings[f.key]}
+              onChange={e => setSettings(p => ({ ...p, [f.key]: e.target.value }))}
             />
           </div>
         ))}
         <div>
           <button className="btn btn-primary" onClick={saveSettings}>Save Settings</button>
         </div>
-        
+
         <div style={{ marginTop: 24, borderTop: '1px solid var(--border)', paddingTop: 20 }}>
           <div className="section-title">Working Hours Configuration</div>
           <table style={{ width: '100%', maxWidth: 700 }}>
@@ -376,14 +376,8 @@ function SettingsTab() {
             <button className="btn btn-primary" onClick={saveAllDays}>Save All Days</button>
           </div>
         </div>
-    
-        <div style={{ background: 'rgba(59,130,246,0.08)', border: '1px solid var(--border)', borderRadius: 10, padding: 16 }}>
-          <div style={{ fontSize: 12, fontFamily: 'var(--mono)', color: 'var(--accent)', marginBottom: 8 }}>API INTEGRATION NOTE</div>
-          <p style={{ fontSize: 13, color: 'var(--text3)', lineHeight: 1.7 }}>
-            Once your Spring Boot backend is ready, replace the placeholder data in <code style={{ color: 'var(--accent2)', background: 'var(--bg2)', padding: '1px 6px', borderRadius: 4 }}>src/data/placeholders.js</code> with
-            Axios / Fetch API calls to your REST endpoints.
-          </p>
-        </div>
+
+
       </div>
     </div>
   );
@@ -423,7 +417,7 @@ function BatchesTab() {
   const submitEditBatch = async () => {
     if (!editingBatch.batchName || !editingBatch.division) return alert("Name and Division are required.");
     try {
-      const payload = { 
+      const payload = {
         ...editingBatch,
         programId: editingBatch.program?.id || 1,
         academicYearId: editingBatch.academicYear?.id || 1
@@ -461,7 +455,7 @@ function BatchesTab() {
               <input placeholder="Semester (e.g. SEM-5)" value={newBatch.semester} onChange={e => setNewBatch(p => ({ ...p, semester: e.target.value }))} />
               <input type="number" placeholder="Student Strength" value={newBatch.studentCount} onChange={e => setNewBatch(p => ({ ...p, studentCount: parseInt(e.target.value) || 30 }))} />
             </div>
-                        <div className="grid-2">
+            <div className="grid-2">
               <input placeholder="OS Requirement (e.g. Linux, Windows, Any)" value={newBatch.osRequirement} onChange={e => setNewBatch(p => ({ ...p, osRequirement: e.target.value }))} />
               <input type="number" placeholder="Labs Per Week" value={newBatch.labsPerWeek} onChange={e => setNewBatch(p => ({ ...p, labsPerWeek: parseInt(e.target.value) || 1 }))} />
             </div>
@@ -470,7 +464,7 @@ function BatchesTab() {
               <input type="time" title="Start Time" value={newBatch.startTime} onChange={e => setNewBatch(p => ({ ...p, startTime: e.target.value }))} />
               <input type="time" title="End Time" value={newBatch.endTime} onChange={e => setNewBatch(p => ({ ...p, endTime: e.target.value }))} />
             </div>
-    
+
             <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
               <button className="btn btn-primary btn-sm" onClick={submitNewBatch}>Create Batch</button>
               <button className="btn btn-secondary btn-sm" onClick={() => setShowAddModal(false)}>Cancel</button>
@@ -500,7 +494,7 @@ function BatchesTab() {
               <input type="time" title="Start Time" value={editingBatch.startTime || ''} onChange={e => setEditingBatch(p => ({ ...p, startTime: e.target.value }))} />
               <input type="time" title="End Time" value={editingBatch.endTime || ''} onChange={e => setEditingBatch(p => ({ ...p, endTime: e.target.value }))} />
             </div>
-    
+
             <div style={{ display: 'flex', gap: 8, marginTop: 4 }}>
               <button className="btn btn-primary btn-sm" onClick={submitEditBatch}>Save Changes</button>
               <button className="btn btn-secondary btn-sm" onClick={() => setEditingBatch(null)}>Cancel</button>
@@ -518,13 +512,13 @@ function BatchesTab() {
               <td style={{ fontFamily: 'var(--mono)' }}>{b.division}</td>
               <td><span className="badge badge-info">{b.semester}</span></td>
               <td style={{ fontFamily: 'var(--mono)' }}>{b.studentCount} Students</td>
-                            <td style={{ fontSize: 13, color: 'var(--text2)' }}>{b.osRequirement || 'Any'} · {b.labsPerWeek || 1}/wk</td>
+              <td style={{ fontSize: 13, color: 'var(--text2)' }}>{b.osRequirement || 'Any'} · {b.labsPerWeek || 1}/wk</td>
               <td style={{ fontSize: 13 }}>
-                {(!b.startTime || b.startTime === '00:00:00' || b.startTime === '00:00') ? 'Any' : b.startTime.substring(0,5)} - 
-                {(!b.endTime || b.endTime === '00:00:00' || b.endTime === '00:00') ? 'Any' : b.endTime.substring(0,5)} 
+                {(!b.startTime || b.startTime === '00:00:00' || b.startTime === '00:00') ? 'Any' : b.startTime.substring(0, 5)} -
+                {(!b.endTime || b.endTime === '00:00:00' || b.endTime === '00:00') ? 'Any' : b.endTime.substring(0, 5)}
                 {(!editingBatch && b.totalHours) ? b.totalHours + 'h' : 'N/A'}
               </td>
-    
+
               <td><button className="btn btn-secondary btn-sm" onClick={() => setEditingBatch(b)}>Edit</button></td>
             </tr>
           ))}
@@ -611,7 +605,7 @@ function UsersTab() {
             </div>
             <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
               <span style={styles.label}>Role:</span>
-              <select style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--border)' }} value={newUser.role[0]} onChange={(e) => setNewUser(p => ({...p, role: [e.target.value]}))}>
+              <select style={{ padding: '6px 12px', borderRadius: 6, border: '1px solid var(--border)' }} value={newUser.role[0]} onChange={(e) => setNewUser(p => ({ ...p, role: [e.target.value] }))}>
                 <option value="staff">Staff</option>
                 <option value="admin">Admin</option>
               </select>

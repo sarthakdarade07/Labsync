@@ -32,13 +32,13 @@ public class SubjectController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<Subject>> updateSubject(@PathVariable Long id, @Valid @RequestBody SubjectRequest request) {
+    public ResponseEntity<ApiResponse<Subject>> updateSubject(@PathVariable("id") Long id, @Valid @RequestBody SubjectRequest request) {
         Subject updated = subjectService.updateSubject(id, request);
         return ResponseEntity.ok(ApiResponse.success("Subject updated successfully", updated));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteSubject(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteSubject(@PathVariable("id") Long id) {
         subjectService.deleteSubject(id);
         return ResponseEntity.ok(ApiResponse.success("Subject deleted successfully", null));
     }
