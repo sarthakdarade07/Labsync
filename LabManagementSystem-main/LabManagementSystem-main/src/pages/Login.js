@@ -63,15 +63,7 @@ export default function Login() {
           </button>
         </form>
 
-        <div style={styles.hint}>
-          <p style={{ color: 'var(--text3)', fontSize: 12, marginBottom: 8, fontFamily: 'var(--mono)', letterSpacing: 1 }}>DEMO CREDENTIALS</p>
-          {[['admin', 'admin123', 'Admin'], ['faculty', 'faculty123', 'Faculty'], ['staff', 'staff123', 'Staff']].map(([u, p, r]) => (
-            <div key={u} style={styles.cred} onClick={() => setForm({ username: u, password: p })}>
-              <span style={{ color: 'var(--accent)', fontFamily: 'var(--mono)', fontSize: 12 }}>{u}</span>
-              <span style={{ color: 'var(--text3)', fontSize: 11 }}>{r}</span>
-            </div>
-          ))}
-        </div>
+
       </div>
     </div>
   );

@@ -16,29 +16,29 @@ import org.springframework.web.bind.annotation.*;
  * AuthController — handles login and user registration.
  *
  * Public endpoints:
- *   POST /auth/login    — returns JWT
+ * POST /auth/login — returns JWT
  *
  * Admin-only:
- *   POST /auth/register — creates a new user (admin or staff)
+ * POST /auth/register — creates a new user (admin or staff)
  *
  * Sample login request:
  * {
- *   "username": "admin",
- *   "password": "admin123"
+ * "username": "admin",
+ * "password": "admin123"
  * }
  *
  * Sample login response:
  * {
- *   "success": true,
- *   "message": "Operation successful",
- *   "data": {
- *     "token": "eyJhbGci...",
- *     "type": "Bearer",
- *     "id": 1,
- *     "username": "admin",
- *     "email": "admin@labsync.com",
- *     "roles": ["ROLE_ADMIN"]
- *   }
+ * "success": true,
+ * "message": "Operation successful",
+ * "data": {
+ * "token": "eyJhbGci...",
+ * "type": "Bearer",
+ * "id": 1,
+ * "username": "admin",
+ * "email": "admin@labsync.com",
+ * "roles": ["ROLE_ADMIN"]
+ * }
  * }
  */
 @RestController
@@ -64,7 +64,8 @@ public class AuthController {
     @PreAuthorize("hasRole(\'ADMIN\')")
     public ResponseEntity<ApiResponse<String>> register(@Valid @RequestBody RegisterRequest registerRequest) {
         User user = authService.register(registerRequest);
-        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User registered successfully", "User \'" + user.getUsername() + "\' created with id=" + user.getId()));
+        return ResponseEntity.status(HttpStatus.CREATED).body(ApiResponse.success("User registered successfully",
+                "User \'" + user.getUsername() + "\' created with id=" + user.getId()));
     }
 
     public AuthController(final AuthService authService) {

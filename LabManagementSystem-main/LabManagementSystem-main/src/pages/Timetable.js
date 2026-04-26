@@ -65,8 +65,10 @@ export default function Timetable() {
             <option value="all">All Labs</option>
             {labs.map(l => <option key={l.id} value={l.id}>{l.labName}</option>)}
           </select>
-          <button className="btn btn-secondary no-print" onClick={printTimetable} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Printer size={16} /> Print</button>
+
+          {/* <button className="btn btn-secondary no-print" onClick={printTimetable} style={{ display: 'flex', alignItems: 'center', gap: 6 }}><Printer size={16} /> Print</button>  */}
         </div>
+
       </div>
 
       <div className="card" style={{ overflowX: 'auto', padding: 0, border: 'none' }}>

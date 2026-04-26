@@ -19,7 +19,12 @@ export default function Labs() {
     try {
       const response = await api.get('/labs');
       if (response.data && response.data.success) {
-        setLabs(response.data.data);
+        const sortedLabs = response.data.data.sort((a, b) => {
+          const nameA = (a.labName || a.name || '').toLowerCase();
+          const nameB = (b.labName || b.name || '').toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+        setLabs(sortedLabs);
       }
     } catch (error) {
       console.error("Error fetching labs:", error);
@@ -46,7 +51,7 @@ export default function Labs() {
           labName: form.name || form.labName,
           location: form.location,
           osType: form.osType,
-          capacity: form.capacity || 1,
+          capacity: +form.capacity || 1,
           totalComputers: total,
           workingComputers: working,
           faultyComputers: faulty
@@ -59,6 +64,17 @@ export default function Labs() {
     } catch (error) {
       console.error("Error saving edit", error);
       alert(error.response?.data?.message || 'Failed to update lab status');
+    }
+  };
+
+  const deleteLab = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this lab?")) return;
+    try {
+      await api.delete(`/labs/${id}`);
+      fetchLabs();
+    } catch (error) {
+      console.error("Error deleting lab:", error);
+      alert(error.response?.data?.message || 'Failed to delete lab');
     }
   };
 
@@ -132,6 +148,7 @@ export default function Labs() {
           const id = lab.id;
           const name = lab.labName || lab.name;
           const location = lab.location || 'Unknown';
+          const osType = lab.osType || 'Not Specified';
           const totalPCs = lab.totalComputers || lab.totalPCs || 0;
           const functionalPCs = lab.workingComputers || lab.functionalPCs || 0;
 
@@ -149,6 +166,8 @@ export default function Labs() {
                     <>
                       <input placeholder="Lab Name" value={form.name || ''} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} />
                       <input placeholder="Location" value={form.location || ''} onChange={e => setForm(p => ({ ...p, location: e.target.value }))} />
+                      <input placeholder="OS Type" value={form.osType || ''} onChange={e => setForm(p => ({ ...p, osType: e.target.value }))} />
+                      <input type="number" placeholder="Capacity" value={form.capacity || ''} onChange={e => setForm(p => ({ ...p, capacity: e.target.value }))} />
                     </>
                   )}
                   <div className="grid-2">
@@ -165,9 +184,14 @@ export default function Labs() {
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 16 }}>
                     <div>
                       <div style={{ fontWeight: 700, fontSize: 15, color: 'var(--text)', marginBottom: 3 }}>{name}</div>
-                      <div style={{ fontSize: 12, color: 'var(--text3)', fontFamily: 'var(--mono)' }}>ID: {id} · {location}</div>
+                      <div style={{ fontSize: 12, color: 'var(--text3)', fontFamily: 'var(--mono)' }}>ID: {id} · {location} · OS: {osType}</div>
                     </div>
-                    <button className="btn btn-secondary btn-sm" onClick={() => startEdit(lab)}>Edit</button>
+                    <div style={{ display: 'flex', gap: 6 }}>
+                      {isAdmin && (
+                        <button className="btn btn-secondary btn-sm" style={{ borderColor: 'var(--warning)', color: 'var(--warning)' }} onClick={() => deleteLab(id)}>Delete</button>
+                      )}
+                      <button className="btn btn-secondary btn-sm" onClick={() => startEdit(lab)}>Edit</button>
+                    </div>
                   </div>
 
                   <div style={{ marginBottom: 16 }}>
@@ -207,12 +231,13 @@ export default function Labs() {
       <div className="card">
         <div className="section-title">Summary Table</div>
         <table>
-          <thead><tr><th>Lab ID</th><th>Name</th><th>Location</th><th>Total PCs</th><th>Functional</th><th>Faulty</th><th>Status</th></tr></thead>
+          <thead><tr><th>Lab ID</th><th>Name</th><th>Location</th><th>OS Type</th><th>Total PCs</th><th>Functional</th><th>Faulty</th><th>Status</th></tr></thead>
           <tbody>
             {labs.map(lab => {
               const id = lab.id;
               const name = lab.labName || lab.name;
               const location = lab.location || 'Unknown';
+              const osType = lab.osType || 'Not Specified';
               const totalPCs = lab.totalComputers || lab.totalPCs || 0;
               const functionalPCs = lab.workingComputers || lab.functionalPCs || 0;
               const faulty = Math.max(0, totalPCs - functionalPCs);
@@ -222,6 +247,7 @@ export default function Labs() {
                   <td style={{ fontFamily: 'var(--mono)', color: 'var(--accent)' }}>{id}</td>
                   <td style={{ color: 'var(--text)' }}>{name}</td>
                   <td>{location}</td>
+                  <td style={{ color: 'var(--text2)' }}>{osType}</td>
                   <td style={{ fontFamily: 'var(--mono)' }}>{totalPCs}</td>
                   <td style={{ color: 'var(--success)', fontFamily: 'var(--mono)' }}>{functionalPCs}</td>
                   <td style={{ color: faulty > 0 ? 'var(--warning)' : 'var(--text3)', fontFamily: 'var(--mono)' }}>{faulty}</td>
